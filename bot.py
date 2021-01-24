@@ -48,7 +48,8 @@ def checkGameStarted(driver):
         live_container = driver.find_element_by_xpath('//div[contains(@class, "live-game-container")]')
     except NoSuchElementException:
         return False
-    if 'ng-hide' in live_container.get_attribute('class'):
+    el_class = live_container.get_attribute('class')
+    if el_class is None or 'ng-hide' in el_class:
         return False
     try:
         live_container.find_element_by_xpath('//span[contains(text(), "شروع نشده")]')
