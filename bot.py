@@ -79,9 +79,9 @@ def make_bet(driver, option_index, amount):
 
     if not checkHaveCharge(driver):
         for admin_cid in ADMINS:
-                tel_bot.sendMessage(chat_id=admin_cid, text="موجودی حساب کافی نیست، سریعتر شارژ کنید !")
-    while not checkHaveCharge(driver):
-        time.sleep(TIMEOUT)
+            tel_bot.sendMessage(chat_id=admin_cid, text="موجودی حساب کافی نیست، سریعتر شارژ کنید !")
+        while not checkHaveCharge(driver): # w8 until charge
+            time.sleep(TIMEOUT)
 
     pishbini_submit = driver.find_element_by_xpath('//div[contains(@class, "button-view-contain-v3")]')
     pishbini_submit.click()
