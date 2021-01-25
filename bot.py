@@ -68,7 +68,12 @@ def make_bet(driver, option_index, amount):
     except NoSuchElementException:
         print('Error: option %s element not found !' % option_index)
         return None
-    driver.execute_script("arguments[0].click();", option_element)
+    while True:
+        if 'blocked' not in option_element.get_attribute('class'):
+            option_element.click()
+            break
+        else:
+            print('Error: option %s element BLOCKED ! waiting ...' % option_index)
 
     pishbini_tab = driver.find_element_by_xpath('//div[@title="پیش‌بینی"]')
     pishbini_tab.click()
