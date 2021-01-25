@@ -74,6 +74,7 @@ def make_bet(driver, option_index, amount):
             break
         else:
             print('Error: option %s element BLOCKED ! waiting ...' % option_index)
+            time.sleep(TIMEOUT) # timeout
 
     pishbini_tab = driver.find_element_by_xpath('//div[@title="پیش‌بینی"]')
     pishbini_tab.click()
