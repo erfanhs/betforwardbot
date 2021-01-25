@@ -4,7 +4,7 @@ import time
 
 TIMEOUT = 5
 
-url = 'https://www.betforward.com/#/sport/?type=0&region=1850001&competition=560&sport=1&game=17468025&lang=fas'
+url = 'https://www.betforward.com/#/sport/?type=0&game=17463693&region=1850001&competition=1840&sport=1&lang=fas'
 
 driver = webdriver.Chrome('chromedriver.exe')
 
@@ -60,7 +60,7 @@ def test_getTotalGoals(driver, res):
 
 
 # test_checkLogedIn(driver, False)
-# test_make_bet(driver, 1.5, '10000', True)
+# test_make_bet(driver, 4.5, '50000', True)
 # test_checkGameEnded(driver, True)
 # test_chackGameIsUnavailable(driver)
 # test_checkGameStarted(driver, True)

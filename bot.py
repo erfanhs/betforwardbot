@@ -68,7 +68,7 @@ def make_bet(driver, option_index, amount):
     except NoSuchElementException:
         print('Error: option %s element not found !' % option_index)
         return None
-    option_element.click()
+    driver.execute_script("arguments[0].click();", option_element)
 
     pishbini_tab = driver.find_element_by_xpath('//div[@title="پیش‌بینی"]')
     pishbini_tab.click()
@@ -81,7 +81,7 @@ def make_bet(driver, option_index, amount):
         for admin_cid in ADMINS:
             tel_bot.sendMessage(chat_id=admin_cid, text="موجودی حساب کافی نیست، سریعتر شارژ کنید !")
         while not checkHaveCharge(driver): # w8 until charge
-            time.sleep(TIMEOUT)
+            time.sleep(TIMEOUT) # timeout
 
     pishbini_submit = driver.find_element_by_xpath('//div[contains(@class, "button-view-contain-v3")]')
     pishbini_submit.click()
