@@ -159,7 +159,7 @@ def add_game(update, context):
     if not game_link.endswith('&lang=fas'):
         game_link += '&lang=fas'
     game_link = game_link.replace('type=1', 'type=0')
-    game_pk = re.findall(r'game=(.*)&', game_link)[0]
+    game_pk = re.findall(r'game=([0-9]*)&', game_link)[0]
     games_col.insert_one({
         'url': game_link,
         'amount': amount,
