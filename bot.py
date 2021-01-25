@@ -111,7 +111,10 @@ def checkGameStarted(driver):
         return True
 
 def getTotalGoals(driver):
-    return sum([int(score_el.find_element_by_tag_name('i').text) for score_el in driver.find_elements_by_class_name('score-total')])
+    try:
+        return sum([int(score_el.find_element_by_tag_name('i').text) for score_el in driver.find_elements_by_class_name('score-total')])
+    except:
+        return 0
 
 def newTab(driver, url="about:blank"):
     driver.execute_script('''window.open("%s","_blank");''' % url)
