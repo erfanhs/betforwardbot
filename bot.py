@@ -1,14 +1,68 @@
 from telegram.ext import Updater, CommandHandler
 import telegram
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException
 from selenium.webdriver.common.keys import Keys
 import pymongo
 import threading
 import time
 import re
+from conf import EMAIL, PASSWD, TOKEN, DBNAME, COLNAME, TIMEOUT, ADMINS
+
+def doLogin(driver):
+    login_button = driver.find_element_by_xpath('//button[contains(text(), "ورود به حساب کاربری")]')
+    login_button.click()
+    email_input = driver.find_element_by_id('signinform-login-input')
+    email_input.clear()
+    email_input.send_keys(EMAIL)
+    passwd_input = driver.find_element_by_id('signinform-password-input')
+    passwd_input.clear()
+    passwd_input.send_keys(PASSWD)
+    button_confirm_div = driver.find_element_by_xpath('//div[contains(@class, "button-confirm")]')
+    login_submit = button_confirm_div.find_element_by_tag_name('button')
+    while True:
+        try:
+            login_submit.click()
+            break
+        except ElementClickInterceptedException:
+            print('Error: disable button ! waiting ...')
+
+def checkHaveCharge(driver):
+    try:
+        bet_error_li = driver.find_element_by_xpath('//span[contains(text(), "موجودی کافی نیست")]/ancestor::li[1]')
+    except NoSuchElementException:
+        return True
+    if 'ng-hide' in bet_error_li.get_attribute('class'):
+        return True
+    return False
+
+def checkLogedIn(driver):
+    try:
+        signin_reg_li = driver.find_element_by_xpath('//div[@id="signin-reg-buttons"]/ancestor::li[1]')
+    except NoSuchElementException:
+        return True
+    if 'ng-hide' in signin_reg_li.get_attribute('class'):
+        return True
+    return False
+
+def closeSlider(driver):
+    try:
+        slider_block = driver.find_element_by_id('block-slider-container')
+    except NoSuchElementException:
+        return
+    if 'ng-hide' not in slider_block.get_attribute('class'):
+        slider_close_button = slider_block.find_element_by_xpath('//div[contains(@class, "close-slider-button-j")]')
+        slider_close_button.click()
 
 def make_bet(driver, option_index, amount):
+
+    #### LOGIN ####
+    if not checkLogedIn(driver):
+        doLogin(driver)
+        time.sleep(TIMEOUT) # timeout
+        closeSlider(driver)
+    #### LOGIN ####
+
     try:
         option_element = driver.find_element_by_xpath("//div[@data-title='مجموع گل‌ها']/ancestor::div[1]//div[@title='کم‌تر از  (%s)']" % option_index)
     except NoSuchElementException:
@@ -23,6 +77,12 @@ def make_bet(driver, option_index, amount):
     amount_element.clear()
     amount_element.send_keys(amount)
 
+    if not checkHaveCharge(driver):
+        for admin_cid in ADMINS:
+                tel_bot.sendMessage(chat_id=admin_cid, text="موجودی حساب کافی نیست، سریعتر شارژ کنید !")
+    while not checkHaveCharge(driver):
+        time.sleep(TIMEOUT)
+
     pishbini_submit = driver.find_element_by_xpath('//div[contains(@class, "button-view-contain-v3")]')
     pishbini_submit.click()
     
@@ -32,13 +92,6 @@ def checkGameEnded(driver):
     game_time_c = driver.find_element_by_xpath('//div[contains(@class, "current-game-info-line")]')
     game_time = game_time_c.find_elements_by_tag_name('span')[-1].text
     return game_time == '90'
-    # try:
-    #     game_finished = driver.find_element_by_xpath('//p[contains(@class, "game-finished")]')
-    # except NoSuchElementException:
-    #     return False
-    # if 'ng-hide' in game_finished.get_attribute('class'):
-    #     return False
-    # return True
 
 def chackGameIsUnavailable(driver, game_pk):
     return game_pk not in driver.current_url
@@ -96,6 +149,8 @@ def bet_thread():
 
 def add_game(update, context):
     cid = update.message.chat_id
+    if cid not in ADMINS:
+        return
     text = update.message.text
     game_link, amount = text.split(' ')[1:]
     if not game_link.endswith('&lang=fas'):
@@ -114,17 +169,19 @@ def add_game(update, context):
 
 
 def start(update, context):
-    context.bot.sendMessage(chat_id=update.message.chat_id, text='welcome!')
+    cid = update.message.chat_id
+    if cid not in ADMINS:
+        return
+    context.bot.sendMessage(chat_id=cid, text='welcome!')
 
 
 if __name__ == '__main__':
 
-    myclient = pymongo.MongoClient("mongodb://localhost:27017/")
-    mydb = myclient["betForward"]
-    games_col = mydb["games"]
+    mongo_client = pymongo.MongoClient("mongodb://localhost:27017/")
+    games_col = mongo_client[DBNAME][COLNAME]
 
-    TOKEN = '1559806560:AAF6iyl8NhEoeycJPSFx2MbM9quE7SYX9-M'
-    updater = Updater(TOKEN)
+    tel_bot = telegram.Bot(TOKEN)
+    updater = Updater(bot=tel_bot)
     dispatcher = updater.dispatcher
 
     dispatcher.add_handler(CommandHandler('start', start))

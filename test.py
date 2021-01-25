@@ -1,14 +1,22 @@
 from selenium import webdriver
-from bot import make_bet, checkGameEnded, chackGameIsUnavailable, checkGameStarted, getTotalGoals, newTab
+from bot import make_bet, checkGameEnded, chackGameIsUnavailable, checkGameStarted, getTotalGoals, newTab, checkLogedIn
 import time 
 
 TIMEOUT = 5
 
-url = 'https://www.betforward.com/#/sport/?type=1&game=17476156&region=2150001&competition=10421&sport=1&lang=fas'
+url = 'https://www.betforward.com/#/sport/?type=0&region=1850001&competition=560&sport=1&game=17468025&lang=fas'
 
 driver = webdriver.Chrome('chromedriver.exe')
 
 driver.get(url)
+
+
+def test_checkLogedIn(driver, res):
+    result = checkLogedIn(driver)
+    if result == res:
+        print('Ok.')
+    else:
+        print('Faild!')
 
 def test_make_bet(driver, option_index, amount, res):
     time.sleep(TIMEOUT)
@@ -50,7 +58,9 @@ def test_getTotalGoals(driver, res):
     else:
         print('Faild!')
 
-# test_make_bet(driver, 3.5, '10000', True)
+
+# test_checkLogedIn(driver, False)
+# test_make_bet(driver, 1.5, '10000', True)
 # test_checkGameEnded(driver, True)
 # test_chackGameIsUnavailable(driver)
 # test_checkGameStarted(driver, True)
