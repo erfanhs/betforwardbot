@@ -1,5 +1,5 @@
 from selenium import webdriver
-from bot import make_bet, checkGameEnded, chackGameIsUnavailable, checkGameStarted, getTotalGoals, newTab, checkLogedIn
+from bot import make_bet, checkGameEnded, chackGameIsUnavailable, checkGameStarted, getTotalGoals, newTab, checkLogedIn, closeActiveTab
 import time 
 
 TIMEOUT = 5

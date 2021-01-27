@@ -126,6 +126,10 @@ def newTab(driver, url="about:blank"):
     driver.execute_script('''window.open("%s","_blank");''' % url)
     driver.switch_to.window(driver.window_handles[-1])
 
+def closeActiveTab(driver):
+    driver.close() # close active tab
+    driver.switch_to.window(driver.window_handles[-1]) # switch to browser last tab
+
 def bet_thread():
     driver = webdriver.Chrome('chromedriver.exe')
     while True:
@@ -144,7 +148,7 @@ def bet_thread():
                     games_col.update_one({'_id': game['_id']}, {'$set': {'status': 'unavailable'}})
                 elif checkGameEnded(driver):
                     games_col.delete_one({'_id': game['_id']})
-                    driver.close() # close current tab
+                    closeActiveTab(driver)
                 elif getTotalGoals(driver) > game['option_index']:
                     new_amount = str(int(int(game['amount']) * 1.5))
                     new_option_index = game['option_index'] + 1
