@@ -136,12 +136,13 @@ def bet_thread():
         for game in games_col.find():
             if game['tab'] is None:
                 newTab(driver, game['url'])
+                time.sleep(TIMEOUT+3)
                 games_col.update_one({'_id': game['_id']}, {'$set': {'tab': driver.current_window_handle}})
             else:
                 driver.switch_to.window(game['tab'])
             if game['status'] == 'waiting':
                 if checkGameStarted(driver):
-                    if make_bet(driver, 1.5, game['amount']):
+                    if make_bet(driver, game['option_index'], game['amount']):
                         games_col.update_one({'_id': game['_id']}, {'$set': {'status': 'live'}})
             elif game['status'] == 'live':
                 if chackGameIsUnavailable(driver, game['game_pk']):
@@ -165,7 +166,7 @@ def add_game(update, context):
     if cid not in ADMINS:
         return
     text = update.message.text
-    game_link, amount = text.split(' ')[1:]
+    game_link, amount, option_index = text.split(' ')[1:]
     if not game_link.endswith('&lang=fas'):
         game_link += '&lang=fas'
     game_link = game_link.replace('type=1', 'type=0')
@@ -173,7 +174,7 @@ def add_game(update, context):
     games_col.insert_one({
         'url': game_link,
         'amount': amount,
-        'option_index': 1.5,
+        'option_index': option_index,
         'status': 'waiting',
         'tab': None,
         'game_pk': game_pk
