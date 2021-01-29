@@ -142,18 +142,22 @@ def bet_thread():
                 driver.switch_to.window(game['tab'])
             if game['status'] == 'waiting':
                 if checkGameStarted(driver):
+                    print('Game Started ...')
                     if make_bet(driver, game['option_index'], game['amount']):
+                        print('New Option: %s - %s' % (game['option_index'], game['amount']))
                         games_col.update_one({'_id': game['_id']}, {'$set': {'status': 'live'}})
             elif game['status'] == 'live':
                 if chackGameIsUnavailable(driver, game['game_pk']):
                     games_col.update_one({'_id': game['_id']}, {'$set': {'status': 'unavailable'}})
                 elif checkGameEnded(driver):
+                    print('Game Ended ...')
                     games_col.delete_one({'_id': game['_id']})
                     closeActiveTab(driver)
                 elif getTotalGoals(driver) > game['option_index']:
                     new_amount = str(int(int(game['amount']) * 1.5))
                     new_option_index = game['option_index'] + 1
                     if make_bet(driver, new_option_index, new_amount):
+                        print('New Option: %s - %s' % (new_option_index, new_amount))
                         games_col.update_one({'_id': game['_id']}, {'$set': {'option_index': new_option_index}})
                         games_col.update_one({'_id': game['_id']}, {'$set': {'amount': new_amount}})
             elif game['status'] == 'unavailable':
@@ -174,7 +178,7 @@ def add_game(update, context):
     games_col.insert_one({
         'url': game_link,
         'amount': amount,
-        'option_index': option_index,
+        'option_index': float(option_index) if '.' in option_index else int(option_index),
         'status': 'waiting',
         'tab': None,
         'game_pk': game_pk
