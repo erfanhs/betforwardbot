@@ -70,7 +70,7 @@ def make_bet(driver, option_index, amount):
         return None
     while True:
         if 'blocked' not in option_element.get_attribute('class'):
-            option_element.click()
+            driver.execute_script("arguments[0].click();", option_element)
             break
         else:
             print('Error: option %s element BLOCKED ! waiting ...' % option_index)
