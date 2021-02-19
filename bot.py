@@ -171,10 +171,8 @@ def add_game(update, context):
         return
     text = update.message.text
     game_link, amount, option_index = text.split(' ')[1:]
-    if not game_link.endswith('&lang=fas'):
-        game_link += '&lang=fas'
-    game_link = game_link.replace('type=1', 'type=0')
-    game_pk = re.findall(r'game=([0-9]*)&', game_link)[0]
+    game_pk = re.findall(r'game\/([0-9]*)', game_link)[0]
+    game_link = 'https://www.betforward.com/#/sport/?type=0&game=%s&lang=fas' % game_pk
     games_col.insert_one({
         'url': game_link,
         'amount': amount,
