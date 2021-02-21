@@ -60,7 +60,7 @@ def make_bet(driver, option_index, amount):
     if not checkLogedIn(driver):
         doLogin(driver)
         time.sleep(TIMEOUT) # timeout
-        closeSlider(driver)
+        # closeSlider(driver)
     #### LOGIN ####
 
     try:
