@@ -60,7 +60,7 @@ def test_getTotalGoals(driver, res):
 
 
 # test_checkLogedIn(driver, False)
-test_make_bet(driver, 2.5, '50000', True)
+# test_make_bet(driver, 2.5, '50000', True)
 # test_checkGameEnded(driver, True)
 # test_chackGameIsUnavailable(driver)
 # test_checkGameStarted(driver, True)
